@@ -1,6 +1,6 @@
 # apiGo
 
-##Architecture
+## Architecture
 L’architecture de notre application se décline comme ceci:
 ```archi
 config/
