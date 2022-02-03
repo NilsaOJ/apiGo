@@ -27,6 +27,7 @@ main.go lance la connexion à notre base de données, ajoute un enregistrement �
 ```router
 router.go définit les routes de notre API
 ```
+## Routage
 ### Get
 ```http request
 GET	/api/v1/users	Lister tous les utilisateurs
