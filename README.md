@@ -7,29 +7,23 @@ db/
     db.go
 models/
     users.go
-myint/
-    myint.go
 service/
     user.go
 util/
     jwt.go
 main.go
-router.go
 ```
 ```database
-config/database.go permet la connexion à la base de données ainsi que la création de la table cars.
+db/db.go permet la connexion à la base de données ainsi que la création de la table user.
 ```
 ``` users
-controllers/users.go fait la relation entre les requêtes http et notre struct Car
+service/user.go fait la relation entre les requêtes http et notre struct User
 ```
 ```user
-models/user.go lie notre struct Car avec les actions en base de données.
+models/user.go lie notre struct User avec les actions en base de données.
 ```
 ```main
 main.go lance la connexion à notre base de données, ajoute un enregistrement à notre base de donnée et lance le serveur http.
-```
-```router
-router.go définit les routes de notre API
 ```
 ## Routage
 ### Get
