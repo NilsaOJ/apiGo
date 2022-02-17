@@ -3,12 +3,16 @@
 ##Architecture
 L’architecture de notre application se décline comme ceci:
 ```archi
-config/
-    database.go
-controllers/
-    users.go
+db/
+    db.go
 models/
+    users.go
+myint/
+    myint.go
+service/
     user.go
+util/
+    jwt.go
 main.go
 router.go
 ```
