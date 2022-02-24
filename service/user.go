@@ -1,14 +1,14 @@
 package service
 
 import (
+	"apiGO/db"
+	"apiGO/models"
+	"apiGO/util"
+
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"apiGO/db"
-	"apiGO/models"
-	"apiGO/util"
 )
 
 type Service struct {

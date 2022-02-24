@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -12,9 +12,6 @@ import (
 	"apiGO/db/sqlite"
 	"apiGO/service"
 	"apiGO/util"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Config struct {
@@ -58,16 +55,4 @@ func main() {
 	r.DELETE("/users/:id", secureJWT, s.DeleteUser)
 	r.POST("/login", s.Login)
 	r.Run(":" + config.ListenPort)
-
-	app := fiber.New()
-	app.Use(cors.New())
-
-	api := app.Group("/api")
-
-	// Test handler
-	api.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("App running")
-	})
-
-	log.Fatal(app.Listen(":5000"))
 }
