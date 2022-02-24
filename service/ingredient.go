@@ -1,32 +1,32 @@
 package service
 
 import (
-	"apiGO/models"
-	"apiGO/util"
-
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"apiGO/models"
 )
 
 // go to Service folder.
-func (s *Service) GetUser(c *gin.Context) {
+func (s *Service) GetIngredient(c *gin.Context) {
 	id := c.Param("id")
-	u, err := s.db.User.GetByID(id)
+	i, err := s.db.Ingredient.GetByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"id": id,
 		})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"user": u,
+		"ingredient": i,
 	})
 }
 
-func (s *Service) GetAllUser(c *gin.Context) {
-	us, err := s.db.User.GetAll()
+func (s *Service) GetAllIngredient(c *gin.Context) {
+	in, err := s.db.Ingredient.GetAll()
 	if err != nil {
 		log.Println("service:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -34,14 +34,15 @@ func (s *Service) GetAllUser(c *gin.Context) {
 		})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"users": us,
+		"ingredients": in,
 	})
 }
 
-func (s *Service) CreateUser(c *gin.Context) {
-	var u models.User
-	err := c.BindJSON(&u)
+func (s *Service) CreateIngredient(c *gin.Context) {
+	var i models.Ingredient
+	err := c.BindJSON(&i)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err": err,
@@ -49,14 +50,14 @@ func (s *Service) CreateUser(c *gin.Context) {
 		return
 	}
 
-	if u.Password == nil || len(*u.Password) == 0 || len(u.Email) == 0 {
+	if len(i.Name) == 0 || len(i.Dlc) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err": "need email and password",
+			"err": "need name and dlc",
 		})
 		return
 	}
 
-	_, err = s.db.User.Create(&u)
+	_, err = s.db.Ingredient.Create(&i)
 	if err != nil {
 		log.Println("service:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -66,11 +67,11 @@ func (s *Service) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"user": u,
+		"ingredient": i,
 	})
 }
 
-func (s *Service) DeleteUser(c *gin.Context) {
+func (s *Service) DeleteIngredient(c *gin.Context) {
 	id := c.Param("id")
 
 	if len(id) == 0 {
@@ -79,7 +80,7 @@ func (s *Service) DeleteUser(c *gin.Context) {
 		})
 		return
 	}
-	err := s.db.User.DeleteByID(id)
+	err := s.db.Ingredient.DeleteByID(id)
 	if err != nil {
 		log.Println("service:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -92,10 +93,9 @@ func (s *Service) DeleteUser(c *gin.Context) {
 	})
 }
 
-func (s *Service) Login(c *gin.Context) {
-
-	var l models.LoginUser
-	err := c.BindJSON(&l)
+func (s *Service) Names(c *gin.Context) {
+	var i models.Ingredient
+	err := c.BindJSON(&i)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err": err,
@@ -103,35 +103,18 @@ func (s *Service) Login(c *gin.Context) {
 		return
 	}
 
-	if l.Password == nil || len(*l.Password) == 0 || len(l.Email) == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "not authorized",
-		})
-		return
-	}
-
-	u, err := s.db.User.GetByEmail(l.Email)
+	in, err := s.db.Recipe.GetByName(i.Name)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"email": l.Email,
+			"name": i.Name,
 		})
 		return
 	}
 
-	if *u.Password != *l.Password {
+	if in.Name != i.Name {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "not authorized",
 		})
 		return
 	}
-
-	jwtVal, err := util.CreateJWT(s.signKey, u.Id, u.Firstname)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, nil)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"jwt": jwtVal,
-	})
 }

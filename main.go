@@ -54,5 +54,17 @@ func main() {
 	r.GET("/users", s.GetAllUser)
 	r.DELETE("/users/:id", secureJWT, s.DeleteUser)
 	r.POST("/login", s.Login)
+
+	r.GET("/recipes/:id", s.GetRecipe)
+	r.POST("/recipes", s.CreateRecipe)
+	r.GET("/recipes", s.GetAllRecipe)
+	r.DELETE("/recipes/:id", secureJWT, s.DeleteRecipe)
+	r.POST("/name", s.Name)
+
+	r.GET("/ingredients/:id", s.GetIngredient)
+	r.POST("/ingredients", s.CreateIngredient)
+	r.GET("/ingredients", s.GetAllIngredient)
+	r.DELETE("/ingredients/:id", secureJWT, s.DeleteIngredient)
+	r.POST("/names", s.Names)
 	r.Run(":" + config.ListenPort)
 }
