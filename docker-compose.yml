@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+  db:
+    container_name: miam-db
+    image: amd64/mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somepwd
+      MYSQL_DATABASE: miamideas-db
+      MYSQL_USER: miamideas-user
+      MYSQL_PASSWORD: miamideas-pwd
+    ports:
+      - 3306:3306
+  cache:
+    image: redis:6.2
+    container_name: miam-cache
+    restart: always
+    ports:
+      - 6379:6379

@@ -7,8 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
+	"apiGO/cache"
 	"apiGO/db"
 	"apiGO/db/moke"
+	"apiGO/db/mysql"
 	"apiGO/db/sqlite"
 	"apiGO/service"
 	"apiGO/util"
@@ -18,6 +20,12 @@ type Config struct {
 	ListenPort string
 	SecretKey  []byte
 	EnvType    string
+	db         struct {
+		DBName string
+		User   string
+		Pass   string
+		Port   string
+	}
 }
 
 var config Config
@@ -33,38 +41,51 @@ func init() {
 	config.EnvType = viper.GetString("EnvType")
 	config.SecretKey = []byte(viper.GetString("SecretKey"))
 	config.ListenPort = viper.GetString("ListenPort")
+	// connect to DB
+	config.db.DBName = viper.GetString("db.DBName")
+	config.db.User = viper.GetString("db.User")
+	config.db.Pass = viper.GetString("db.Pass")
+	config.db.Port = viper.GetString("db.Port")
 }
 
 func main() {
 	r := gin.Default()
-	var db *db.Storage
+	var DB *db.Storage
 	log.Println("ENV:", config.EnvType)
 	if config.EnvType == "dev" {
 		log.Println("create Moke DB")
-		db = moke.New()
+		DB = moke.New()
+	} else if config.EnvType == "pprod" {
+		log.Println("connect to an MySQL")
+		DB = mysql.New(config.db.DBName, config.db.User, config.db.Pass, config.db.Port)
 	} else {
 		log.Println("create SQLite DB")
-		db = sqlite.New("storage.db")
+		DB = sqlite.New("storage.db")
 	}
 
 	secureJWT := util.MiddlJWT(config.SecretKey)
-	s := service.New(db, config.SecretKey)
-	r.GET("/users/:id", s.GetUser)
+	c := cache.New()
+	cacheMdw := cache.MiddlCache(c)
+	s := service.New(DB, c, config.SecretKey)
+	r.GET("/users/:id", cacheMdw, s.GetUser)
 	r.POST("/users", s.CreateUser)
-	r.GET("/users", s.GetAllUser)
+	r.GET("/users", cacheMdw, s.GetAllUser)
 	r.DELETE("/users/:id", secureJWT, s.DeleteUser)
 	r.POST("/login", s.Login)
 
-	r.GET("/recipes/:id", s.GetRecipe)
+	r.GET("/recipes/:id", cacheMdw, s.GetRecipe)
 	r.POST("/recipes", s.CreateRecipe)
-	r.GET("/recipes", s.GetAllRecipe)
+	r.GET("/recipes", cacheMdw, s.GetAllRecipe)
 	r.DELETE("/recipes/:id", secureJWT, s.DeleteRecipe)
 	r.POST("/name", s.Name)
 
-	r.GET("/ingredients/:id", s.GetIngredient)
+	r.GET("/ingredients/:id", cacheMdw, s.GetIngredient)
 	r.POST("/ingredients", s.CreateIngredient)
-	r.GET("/ingredients", s.GetAllIngredient)
+	r.GET("/ingredients", cacheMdw, s.GetAllIngredient)
 	r.DELETE("/ingredients/:id", secureJWT, s.DeleteIngredient)
 	r.POST("/names", s.Names)
-	r.Run(":" + config.ListenPort)
+	err := r.Run(":" + config.ListenPort)
+	if err != nil {
+		return 
+	}
 }

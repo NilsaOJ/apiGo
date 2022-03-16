@@ -46,3 +46,7 @@ PUT	/api/v1/users/1	Modifier l'utilisateur #1
 ```http request
 DELETE	/api/v1/users/1	l'utilisateur #1
 ```
+
+##Start a Go instance in your app
+docker build -t miamideas-golang-app .
+docker run -it --rm --name miamideas-running-app miamideas-golang-app

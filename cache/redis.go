@@ -20,7 +20,7 @@ func New() *Cache {
 		MaxIdle:   80,
 		MaxActive: 12000,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", ":6379")
+			c, err := redis.Dial("tcp", "redis:6379")
 			if err != nil {
 				panic(err.Error())
 			}
@@ -73,7 +73,10 @@ func MiddlCache(c *Cache) func(ctx *gin.Context) {
 			log.Println("get from cache the response")
 			ctx.Writer.WriteHeader(http.StatusOK)
 			ctx.Writer.Header().Set("content-type", "application/json")
-			ctx.Writer.Write(value)
+			_, err := ctx.Writer.Write(value)
+			if err != nil {
+				return 
+			}
 			ctx.Abort()
 			return
 		}
@@ -82,7 +85,10 @@ func MiddlCache(c *Cache) func(ctx *gin.Context) {
 		ctx.Writer = blw
 		ctx.Next()
 		log.Println("set cache for next response")
-		c.SetString(ctx.Request.URL.String(), blw.body.String())
+		err = c.SetString(ctx.Request.URL.String(), blw.body.String())
+		if err != nil {
+			return 
+		}
 	}
 }
 

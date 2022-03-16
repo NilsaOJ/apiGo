@@ -1,15 +1,13 @@
 package service
 
 import (
+	"apiGO/models"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
-
-	"apiGO/models"
 )
 
-// go to Service folder.
+//GetIngredient go to Service folder.
 func (s *Service) GetIngredient(c *gin.Context) {
 	id := c.Param("id")
 	i, err := s.db.Ingredient.GetByID(id)
