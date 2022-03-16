@@ -48,7 +48,7 @@ DELETE	/api/v1/users/1	l'utilisateur #1
 ```
 
 ## Start a Go instance in your app
-```http request
+```
 docker build -t miamideas-golang-app .
 docker run -it --rm --name miamideas-running-app miamideas-golang-app
 ```
