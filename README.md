@@ -48,4 +48,6 @@ DELETE	/api/v1/users/1	l'utilisateur #1
 ```
 
 ## Start a Go instance in your app
+```
 docker-compose up --build
+```
