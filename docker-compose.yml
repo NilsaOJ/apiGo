@@ -1,27 +1,52 @@
 version: "3.9"
 
 services:
-  app:
-    build:
-      dockerfile: Dockerfile
-      context: .
-      target: dev
-    volumes:
-      - .:/app
-  db:
+  mysql:
     container_name: miam-db
-    image: amd64/mysql:5.7
+    image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: somepwd
-      MYSQL_DATABASE: miamideas-db
-      MYSQL_USER: miamideas-user
-      MYSQL_PASSWORD: miamideas-pwd
+      MYSQL_ROOT_PASSWORD: miampwd
+      MYSQL_DATABASE: miam-db
+      MYSQL_USER: miam-user
+      MYSQL_PASSWORD: miam-pwd
     ports:
-      - 3306:3306
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - full
+  app:
+    depends_on:
+      - mysql
+    container_name: miam-app
+    restart: on-failure
+    image: miam-app
+    build: .
+#    environment:
+#      DB_HOST: mysql
+#      DB_PORT: 3306
+#      DB_USER: miam-user
+#      DB_PASSWORD: miam-pwd
+#      DB_NAME: miam-db
+    ports:
+      - "8080:8080"
+    links:
+      - mysql:database
+    volumes:
+      - .:/app
+    networks:
+      - full
   cache:
     image: redis:6.2
     container_name: miam-cache
     restart: always
     ports:
-      - 6379:6379
+      - "6379:6379"
+volumes:
+  api:
+  mysql-data:
+    driver: local
+networks:
+  full:
+    driver: bridge

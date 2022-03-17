@@ -38,6 +38,7 @@ func init() {
 	if err != nil {               // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %w \n", err))
 	}
+	// recup config
 	config.EnvType = viper.GetString("EnvType")
 	config.SecretKey = []byte(viper.GetString("SecretKey"))
 	config.ListenPort = viper.GetString("ListenPort")
@@ -52,12 +53,15 @@ func main() {
 	r := gin.Default()
 	var DB *db.Storage
 	log.Println("ENV:", config.EnvType)
+	//for the env of dev is a moke db
 	if config.EnvType == "dev" {
 		log.Println("create Moke DB")
 		DB = moke.New()
+	//for th env of pprod is a mysql db
 	} else if config.EnvType == "pprod" {
 		log.Println("connect to an MySQL")
 		DB = mysql.New(config.db.DBName, config.db.User, config.db.Pass, config.db.Port)
+	//sinon is a sqllite db
 	} else {
 		log.Println("create SQLite DB")
 		DB = sqlite.New("storage.db")

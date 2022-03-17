@@ -7,7 +7,6 @@ import (
 )
 
 func TestRecipeMarshalJSON(t *testing.T) {
-	//pwd := Password("tst123")
 	r := Recipe{
 		Name: "Crêpe",
 		SetupTime:  20,

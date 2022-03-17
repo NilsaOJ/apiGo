@@ -2,7 +2,7 @@ SecretKey: toto
 ListenPort: 8081
 EnvType: prod
 DB:
-  DBName: miamideas-db
-  User: miamideas-user
-  Pass: miamideas-pwd
+  DBName: miam-db
+  User: miam-user
+  Pass: miam-pwd
   Port: 3306

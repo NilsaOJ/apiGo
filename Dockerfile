@@ -1,18 +1,22 @@
-# Create another stage called "dev" that is based off of our "base" stage (so we have golang available to us)
-FROM golang:1.17
+# Start from base image
+FROM golang:1.17-buster as builder
 
-# Create and change to the app directory.
-WORKDIR /app/go-miamideas
+RUN mkdir /app
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
+# Set the current working directory inside the container
+WORKDIR /app
+
+# Copy go mod and sum files
 COPY go.mod go.sum ./
+
+# Download all dependencies
 RUN go mod download && go mod verify
 
-# Copy local code to the container image.
+# Copy source from current directory to working directory
 COPY . .
 
-# Build the binary.
-RUN go build -v -o ./out/go-miamideas .
+RUN go get github.com/githubnemo/CompileDaemon
 
-# Run the web service on container startup.
-CMD ["./out/go-miamideas"]
+EXPOSE 8000
+
+ENTRYPOINT CompileDaemon --build="go build main.go" --command=./main
